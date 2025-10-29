@@ -1,0 +1,6 @@
+dependencies {
+    implementation group: 'com.fasterxml.uuid', name: 'java-uuid-generator', version: javaUuidGeneratorVersion
+
+    // Apache commons
+    api group: 'org.apache.commons', name: 'commons-collections4', version: apacheCommonsCollections4Version
+}

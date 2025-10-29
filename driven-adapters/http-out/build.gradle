@@ -1,0 +1,23 @@
+dependencies {
+
+    // Internal dependencies
+    implementation project(':commons')
+    implementation project(':domain:catalog')
+    implementation project(':domain:ports:http-out-api')
+
+    // Retrofit
+    implementation group: 'com.squareup.retrofit2', name: 'retrofit', version: retrofitVersion
+    implementation group: 'com.squareup.retrofit2', name: 'converter-jackson', version: retrofitVersion
+
+    // Mapstruct
+    implementation group: 'org.mapstruct', name: 'mapstruct', version: mapstructVersion
+    implementation group: 'org.mapstruct', name: 'mapstruct-processor', version: mapstructVersion
+
+    // Others
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: jacksonDatatypeJSR310Version
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: springBootVersion
+
+    // Tests
+    testImplementation group: 'com.squareup.okhttp3', name: 'mockwebserver', version: okHttpVersion
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
+}

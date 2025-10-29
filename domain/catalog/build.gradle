@@ -1,0 +1,7 @@
+dependencies {
+
+    // Tests
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: jUnit5Version
+    testImplementation group: 'net.datafaker', name: 'datafaker', version: datafakerVersion
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: assertJVersion
+}

@@ -1,0 +1,27 @@
+buildscript {
+    dependencies {
+        classpath 'org.postgresql:postgresql:42.3.1'
+    }
+}
+
+plugins {
+    id "org.flywaydb.flyway" version "${flywayPluginVersion}"
+    //id 'com.palantir.docker' version "${palantirDockerPluginVersion}"
+}
+
+flyway {
+    url = project.hasProperty('url') ? project.getProperty('url') : 'jdbc:postgresql://localhost:5432/skydrivers'
+    user = project.hasProperty('user') ? project.getProperty('user') : 'postgres'
+    password = project.hasProperty('password') ? project.getProperty('password') : 'postgres'
+    driver = 'org.postgresql.Driver'
+    table = 'flyway_schema_history'
+    schemas = ['public']
+    outOfOrder = false
+    baselineOnMigrate = true
+    baselineVersion = 0
+    locations = ['classpath:db/migration']
+}
+
+dependencies {
+    api group: 'org.flywaydb', name: 'flyway-core', version: flywayVersion
+}

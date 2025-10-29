@@ -1,3 +1,24 @@
 rootProject.name = 'mytv'
 
 include 'app'
+
+include ':domain'
+include ':domain:catalog'
+include ':domain:domain-api'
+include ':domain:usecases'
+
+include ':domain:ports'
+include ':domain:ports:http-out-api'
+
+include ':commons'
+
+include ':driven-adapters'
+include ':driven-adapters:http-out'
+
+include ':driver-adapters'
+include ':driver-adapters:http-in'
+include ':driven-adapters:infrastructure'
+include ':driven-adapters:infrastructure:persistence'
+include ':driven-adapters:infrastructure:persistence:postgresql-jpa'
+include ':domain:ports:persistence-api'
+include ':driven-adapters:infrastructure:persistence:migrations-jpa'

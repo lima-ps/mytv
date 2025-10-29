@@ -1,0 +1,40 @@
+dependencies {
+
+    // Internal dependencies
+    implementation project(':commons')
+    //implementation project(':commons:persistence-commons')
+    implementation project(':domain:catalog')
+    implementation project(':domain:ports:persistence-api')
+
+    // Data sources
+    implementation group: 'org.postgresql', name: 'postgresql', version: postgresqlVersion
+
+    //Spring
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: springBootVersion
+
+    //Hibernate Types (JsonB support)
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: jacksonDatatypeJSR310Version
+    implementation group: 'io.hypersistence', name: 'hypersistence-utils-hibernate-63', version: hypersistenceUtilsHibernate
+
+    //Query DSL
+
+    // Validation
+    implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: hibernateValidatorVersion
+
+    implementation group: 'org.hibernate', name: 'hibernate-envers', version: hibernateEnversVersion
+
+    implementation group: 'org.mapstruct', name: 'mapstruct', version: mapstructVersion
+
+    implementation group: 'org.apache.commons', name: 'commons-text', version: commonsTextVersion
+
+    //Annotation Processors
+    annotationProcessor group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: springBootVersion
+
+    //Test implementations
+    //testImplementation project(':driven-adapters:infrastructure:persistence:migrations-jpa')
+
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
+    testImplementation group: 'org.flywaydb', name: 'flyway-core', version: flywayVersion
+    testImplementation group: 'net.datafaker', name: 'datafaker', version: datafakerVersion
+}

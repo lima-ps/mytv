@@ -1,0 +1,19 @@
+dependencies {
+    // Internal
+    implementation project(':commons')
+
+    implementation project(':domain:domain-api')
+    implementation project(':domain:catalog')
+
+    implementation project(':domain:ports:http-out-api')
+
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: apacheCommonsVersion
+
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: springBootVersion
+
+    implementation group: 'org.mapstruct', name: 'mapstruct', version: mapstructVersion
+    implementation group: 'org.mapstruct', name: 'mapstruct-processor', version: mapstructVersion
+
+    // Tests
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
+}
