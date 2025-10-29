@@ -1,0 +1,51 @@
+plugins {
+    id 'org.springframework.boot' version "${springBootVersion}"
+}
+
+archivesBaseName = "mytv"
+
+bootJar {
+    mainClass = 'com.phill.mytv.app.Application'
+    manifest {
+        attributes 'Implementation-Title': 'mytv'
+        attributes 'Implementation-Version': rootProject.version
+    }
+    archiveFileName = "${archiveBaseName.get()}.${archiveExtension.get()}"
+}
+
+dependencies {
+
+    implementation 'org.projectlombok:lombok:1.18.18'
+
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter', version: springBootVersion
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: springBootVersion
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: springBootVersion
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: springBootVersion
+    compileOnly group: 'org.springframework.boot', name: 'spring-boot-devtools', version: springBootVersion
+
+    // Hibernate
+    implementation group: 'org.hibernate', name: 'hibernate-core', version: hibernateVersion
+    implementation group: 'org.hibernate', name: 'hibernate-micrometer', version: hibernateVersion
+
+    // MapStruct
+    implementation group: 'org.mapstruct', name: 'mapstruct', version: mapstructVersion
+
+    // Others
+    implementation group: 'com.squareup.retrofit2', name: 'retrofit', version: retrofitVersion
+    implementation group: 'com.squareup.retrofit2', name: 'converter-jackson', version: retrofitVersion
+    implementation group: 'org.flywaydb', name: 'flyway-core', version: flywayVersion
+
+    //Test
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: jUnit5Version
+}
+
+configurations {
+    [apiElements, runtimeElements].each {
+        it.outgoing.artifacts.removeIf {
+            it.buildDependencies.getDependencies(null).contains(jar)
+        }
+        it.outgoing.artifact(bootJar)
+    }
+}
