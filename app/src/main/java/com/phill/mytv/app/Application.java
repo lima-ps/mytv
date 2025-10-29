@@ -1,4 +1,4 @@
-package com.phill.mytv;
+package com.phill.mytv.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

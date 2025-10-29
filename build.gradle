@@ -1,38 +1,166 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.7'
-    id 'io.spring.dependency-management' version '1.1.7'
+    id 'war'
+    id 'com.github.ben-manes.versions' version '0.42.0'
+    id 'checkstyle'
+    id 'com.github.spotbugs' version '6.0.2'
+    id 'org.sonarqube' version '3.0'
+    id 'maven-publish'
 }
 
-group = 'com.phill'
-version = '0.0.1-SNAPSHOT'
-description = 'mytv'
+sourceCompatibility = 21
+targetCompatibility = 21
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
+dependencyUpdates.resolutionStrategy {
+    componentSelection { rules ->
+        rules.all { ComponentSelection selection ->
+            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm', 'preview', 'b', 'ea'].any { qualifier ->
+                selection.candidate.version ==~ /(?i).*[.-]$qualifier[.\d-+]*/
+            }
+            if (rejected) {
+                selection.reject('Release candidate')
+            }
+        }
     }
 }
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+subprojects {
+    apply plugin: 'maven-publish'
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+
+    group 'com.phill'
+
+    sourceCompatibility = 21
+    targetCompatibility = 21
+
+    compileJava {
+        options.compilerArgs << "-Amapstruct.unmappedTargetPolicy=ERROR"
+        options.compilerArgs << "-Amapstruct.defaultInjectionStrategy=constructor"
+        options.compilerArgs << "-parameters"
     }
-}
 
-repositories {
-    mavenCentral()
-}
+    ext {
+        javaUuidGeneratorVersion = '5.1.0'
+        springVersion = '6.1.13'
+        springBootVersion = '3.3.4'
+        springDataCommonsVersion = '3.3.4'
+        lombokVersion = '1.18.30'
+        jacksonVersion = '2.15.4'
+        hibernateVersion = '6.4.4.Final'
+        hibernateValidatorVersion = '8.0.1.Final'
+        hibernateEnversVersion = '6.4.4.Final'
+        hypersistenceUtilsHibernate = '3.9.10'
+        postgresqlVersion = '42.6.1'
+        commonsTextVersion = '1.11.0'
+        apacheCommonsCollections4Version = '4.4'
+        apacheCommonsVersion = '3.13.0'
+        jacksonDatatypeJSR310Version = '2.15.4'
+        datafakerVersion = '2.1.0'
+        assertJVersion = '3.25.3'
+        jUnit5Version = '5.10.2'
+        testContainersVersion = '1.19.5'
+        mapstructVersion = '1.5.5.Final'
+        lombokMapstructBindingVersion = '0.2.0'
+        flywayVersion = '9.22.3'
+        retrofitVersion = '2.11.0'
+        queryDslVersion = '5.0.0'
+        mockitoCoreVersion = '5.11.0'
+        mockitoJunitJupiterVersion = '5.11.0'
+        okHttpVersion = '4.4.0'
+        slf4japiVersion = '2.0.12'
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
+        //Plugins
+        flywayPluginVersion = '8.0.5'
+        gitCommitPluginVersion = '2.4.1'
+        palantirDockerPluginVersion = '0.36.0'
+        testSetsPluginVersion = '4.1.0'
+        shadowPluginVersion = '8.1.1'
+    }
 
-tasks.named('test') {
-    useJUnitPlatform()
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    dependencies {
+
+        implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: hibernateValidatorVersion
+        compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+        annotationProcessor group: 'org.mapstruct', name: 'mapstruct-processor', version: mapstructVersion
+        annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+        annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
+
+        implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4japiVersion
+
+        testCompileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+        testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+
+        testImplementation group: 'net.datafaker', name: 'datafaker', version: datafakerVersion
+
+        // Spotbugs
+    }
+
+    test {
+        group = LifecycleBasePlugin.VERIFICATION_GROUP
+        description = 'Runs unit tests.'
+        maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+
+        useJUnitPlatform()
+        filter {
+            excludeTestsMatching "*TestIT.*"
+            includeTestsMatching "*Test.*"
+            setFailOnNoMatchingTests false
+        }
+        testLogging {
+            events "passed", "skipped", "failed"
+            exceptionFormat = 'full'
+
+            afterSuite { desc, result ->
+                if (!desc.parent) { // will match the outermost suite
+                    println "UT [${project.name}] Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
+                }
+            }
+        }
+        reports {
+            html.required.set(true)
+            junitXml.required.set(true)
+        }
+    }
+
+    tasks.register("integrationTest", Test) {
+        group = LifecycleBasePlugin.VERIFICATION_GROUP
+        description = 'Runs integration tests.'
+        maxParallelForks = 1
+
+        useJUnitPlatform()
+        filter {
+            excludeTestsMatching '*Test.*'
+            includeTestsMatching '*TestIT.*'
+            setFailOnNoMatchingTests false
+        }
+        testLogging {
+            events "passed", "skipped", "failed"
+            exceptionFormat = 'full'
+
+            afterSuite { desc, result ->
+                if (!desc.parent) { // will match the outermost suite
+                    println "IT [${project.name}] Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
+                }
+            }
+        }
+        reports {
+            html.required.set(true)
+            junitXml.required.set(true)
+            html.outputLocation.set(layout.buildDirectory.dir("reports/tests/integrationTest"))
+            junitXml.outputLocation.set(layout.buildDirectory.dir("test-results/integrationTest"))
+        }
+        mustRunAfter tasks.test
+    }
+
+    check {
+        dependsOn test
+        dependsOn integrationTest
+    }
 }
